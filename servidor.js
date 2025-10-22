@@ -18,7 +18,7 @@ const meuLogger = (req, res, next) => {
 
 app.use(express.json())
 app.use(meuLogger)
-app.use('/usuario', usuario);
+app.use('/usuarios', usuario);
 app.use('/mensagens', mensagem);
 
 app.get('/', (req, res) => {
@@ -40,12 +40,9 @@ app.use(tratadorDeErros);
 sequelize.authenticate()
     .then(() =>{
         console.log('✅ Conexão com o banco de dados estabelecida com sucesso.')
-        sequelize.sync().then(() => {
-            console.log('✅ Tabelas sincronizadas.');
-            app.listen(porta, () => {
-                console.log(`🚀 Servidor Express a funcionar em http://localhost:${porta}`)
-            });
-        })
+        app.listen(porta, () => {
+            console.log(`🚀 Servidor Express a funcionar em http://localhost:${porta}`)
+        });
     })
     .catch(err => {
         console.error('❌ Não foi possível conectar ao banco de dados:', err)

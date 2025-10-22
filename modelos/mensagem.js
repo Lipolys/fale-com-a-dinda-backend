@@ -1,5 +1,6 @@
 const {DataTypes} = require('sequelize');
 const sequelize = require('../banco')
+const Usuario = require('./usuario');
 
 const Mensagem = sequelize.define('Mensagem', {
     id: {
@@ -17,5 +18,7 @@ const Mensagem = sequelize.define('Mensagem', {
         }
     }
 })
+
+Mensagem.belongsTo(Usuario);
 
 module.exports = Mensagem;

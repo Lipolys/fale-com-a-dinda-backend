@@ -6,7 +6,7 @@ const listarTodas = async (req, res) => {
 }
 
 const inserir = async (req, res) => {
-    const novaMensagem = await Mensagem.create({ texto: req.body.texto });
+    const novaMensagem = await Mensagem.create({ texto: req.body.texto, UsuarioId: req.usuarioId });
     res.status(201).json(novaMensagem);
 }
 

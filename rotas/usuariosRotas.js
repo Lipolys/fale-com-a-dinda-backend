@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const {registrar, login} = require("../controladores/usuariosControlador");
+const {cadastrar, login} = require("../controladores/usuariosControlador");
 
-router.post('/', registrar)
-router.post('/', login)
+router.post('/cadastrar', cadastrar)
+router.post('/login', login)
 
 module.exports = router;

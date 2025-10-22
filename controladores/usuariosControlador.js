@@ -2,8 +2,9 @@ const Usuario = require ('../modelos/usuario');
 const bcrypt = require("bcrypt");
 const {sign} = require("jsonwebtoken");
 
-const registrar = async (req, res) => {
+const cadastrar = async (req, res) => {
     const novoUsuario = await Usuario.create({ email: req.body.email, senha: req.body.senha });
+    //await novoUsuario.reload();
     res.status(201).json(novoUsuario);
 }
 
@@ -30,6 +31,6 @@ const login = async (req, res) => {
 }
 
 module.exports = {
-    registrar,
+    cadastrar,
     login
 }

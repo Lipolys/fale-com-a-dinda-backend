@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require ('express');
 const sequelize = require('./modelos/banco');
 const usuario = require ('./rotas/usuariosRotas');
-
+const dica = require ('./rotas/dicaRotas');
 const app = express()
 const porta = process.env.PORTA_API;
 
@@ -18,6 +18,7 @@ const meuLogger = (req, res, next) => {
 app.use(express.json())
 app.use(meuLogger)
 app.use('/usuarios', usuario);
+app.use('/dicas', dica);
 
 app.get('/', (req, res) => {
     res.send('<h1>API Fale com a Dinda no ar!</h1>');

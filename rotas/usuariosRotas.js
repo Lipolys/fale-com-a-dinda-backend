@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {cadastrar, login} = require("../controladores/usuariosControlador");
+const {cadastrar, login} = require("../controladores/usuarioControlador");
 
 router.post('/cadastrar', cadastrar)
 router.post('/login', login)

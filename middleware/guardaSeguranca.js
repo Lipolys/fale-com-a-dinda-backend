@@ -1,4 +1,3 @@
-// middleware/guardaSeguranca.js
 const jwt = require('jsonwebtoken');
 
 const guardaSeguranca = (req, res, next) => {
@@ -14,8 +13,8 @@ const guardaSeguranca = (req, res, next) => {
     }
 
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET);
-        req.usuarioId = payload.id;
+        req.usuario = jwt.verify(token, process.env.JWT_SECRET);
+
         next();
 
     } catch (error) {

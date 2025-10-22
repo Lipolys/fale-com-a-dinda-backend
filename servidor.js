@@ -1,8 +1,7 @@
 require('dotenv').config();
 
 const express = require ('express');
-const sequelize = require('./banco');
-const mensagem = require ('./rotas/mensagensRotas')
+const sequelize = require('./modelos/banco');
 const usuario = require ('./rotas/usuariosRotas');
 
 const app = express()
@@ -19,7 +18,6 @@ const meuLogger = (req, res, next) => {
 app.use(express.json())
 app.use(meuLogger)
 app.use('/usuarios', usuario);
-app.use('/mensagens', mensagem);
 
 app.get('/', (req, res) => {
     res.send('<h1>API Fale com a Dinda no ar!</h1>');

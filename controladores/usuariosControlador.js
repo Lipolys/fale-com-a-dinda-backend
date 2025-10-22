@@ -4,7 +4,7 @@ const {sign} = require("jsonwebtoken");
 
 const cadastrar = async (req, res) => {
     const novoUsuario = await Usuario.create({ email: req.body.email, senha: req.body.senha });
-    //await novoUsuario.reload();
+    await novoUsuario.reload();
     res.status(201).json(novoUsuario);
 }
 

@@ -1,4 +1,3 @@
-// rotas/dicaRotas.js
 const express = require('express');
 const router = express.Router();
 const dicaControlador = require('../controladores/dicaControlador');

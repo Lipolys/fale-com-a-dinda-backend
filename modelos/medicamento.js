@@ -15,8 +15,12 @@ const Medicamento = sequelize.define('Medicamento', {
             key: 'idfarmaceutico'
         }
     },
-    descricao: {
+    nome: {
         type: DataTypes.STRING(45),
+        allowNull: false
+    },
+    descricao: {
+        type: DataTypes.TEXT,
         allowNull: false
     },
     classe: {

@@ -1,5 +1,5 @@
 // controladores/interacaoControlador.js
-const { Interacao, Farmaceutico, Medicamento, Cliente, Ministra, sequelize } = require('../modelos/associacoes');
+const { Interacao, Farmaceutico, Medicamento, Cliente, Ministra, Usuario, sequelize } = require('../modelos/associacoes');
 const { Op } = require('sequelize'); // Necessário para consultas mais complexas
 
 // Função auxiliar para buscar o ID do farmacêutico logado
@@ -114,6 +114,10 @@ const editar = async (req, res) => {
     const usuarioId = req.usuario.id;
 
     // --- Validações ---
+    if (!medId1 || !medId2) {
+        return res.status(400).json({ erro: 'IDs dos medicamentos são obrigatórios.' });
+    }
+
     if (!descricao || descricao.trim() === '') {
         return res.status(400).json({ erro: 'O campo descrição é obrigatório.' });
     }
@@ -127,9 +131,17 @@ const editar = async (req, res) => {
             return res.status(403).json({ erro: 'Perfil de farmacêutico não encontrado.' });
         }
 
+        // Converte para número e valida
+        const med1 = parseInt(medId1);
+        const med2 = parseInt(medId2);
+
+        if (isNaN(med1) || isNaN(med2)) {
+            return res.status(400).json({ erro: 'IDs dos medicamentos devem ser números válidos.' });
+        }
+
         // Garante a ordem correta dos IDs
-        const id1 = Math.min(parseInt(medId1), parseInt(medId2));
-        const id2 = Math.max(parseInt(medId1), parseInt(medId2));
+        const id1 = Math.min(med1, med2);
+        const id2 = Math.max(med1, med2);
 
         const interacao = await Interacao.findOne({
             where: { idmedicamento1: id1, idmedicamento2: id2 }
@@ -140,9 +152,9 @@ const editar = async (req, res) => {
         }
 
         // Opcional: Verificar se o farmacêutico logado é o mesmo que criou
-        // if (interacao.farmaceutico_idfarmaceutico !== farmaceuticoId) {
-        //     return res.status(403).json({ erro: 'Você não tem permissão para editar esta interação.' });
-        // }
+        if (interacao.farmaceutico_idfarmaceutico !== farmaceuticoId) {
+            return res.status(403).json({ erro: 'Você não tem permissão para editar esta interação.' });
+        }
 
         interacao.descricao = descricao;
         interacao.gravidade = gravidade;
@@ -160,15 +172,28 @@ const deletar = async (req, res) => {
     const { medId1, medId2 } = req.params;
     const usuarioId = req.usuario.id;
 
+    // --- Validações ---
+    if (!medId1 || !medId2) {
+        return res.status(400).json({ erro: 'IDs dos medicamentos são obrigatórios.' });
+    }
+
     try {
         const farmaceuticoId = await buscarFarmaceuticoId(usuarioId);
         if (!farmaceuticoId) {
             return res.status(403).json({ erro: 'Perfil de farmacêutico não encontrado.' });
         }
 
+        // Converte para número e valida
+        const med1 = parseInt(medId1);
+        const med2 = parseInt(medId2);
+
+        if (isNaN(med1) || isNaN(med2)) {
+            return res.status(400).json({ erro: 'IDs dos medicamentos devem ser números válidos.' });
+        }
+
         // Garante a ordem correta dos IDs
-        const id1 = Math.min(parseInt(medId1), parseInt(medId2));
-        const id2 = Math.max(parseInt(medId1), parseInt(medId2));
+        const id1 = Math.min(med1, med2);
+        const id2 = Math.max(med1, med2);
 
         const interacao = await Interacao.findOne({
             where: { idmedicamento1: id1, idmedicamento2: id2 }
@@ -179,9 +204,9 @@ const deletar = async (req, res) => {
         }
 
         // Opcional: Verificar se o farmacêutico logado é o mesmo que criou
-        // if (interacao.farmaceutico_idfarmaceutico !== farmaceuticoId) {
-        //     return res.status(403).json({ erro: 'Você não tem permissão para deletar esta interação.' });
-        // }
+        if (interacao.farmaceutico_idfarmaceutico !== farmaceuticoId) {
+            return res.status(403).json({ erro: 'Você não tem permissão para deletar esta interação.' });
+        }
 
         await interacao.destroy();
 

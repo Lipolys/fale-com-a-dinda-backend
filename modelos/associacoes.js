@@ -35,6 +35,15 @@ Faq.belongsTo(Farmaceutico, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'fa
 Farmaceutico.hasMany(Interacao, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'interacoesRegistradas' });
 Interacao.belongsTo(Farmaceutico, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'farmaceutico' });
 
+// --- Relações diretas da tabela Ministra (NOVO) ---
+
+// Relação 1:N - Cliente -> Ministra
+Cliente.hasMany(Ministra, { foreignKey: 'cliente_idcliente', as: 'medicamentosMinistrados' });
+Ministra.belongsTo(Cliente, { foreignKey: 'cliente_idcliente', as: 'cliente' });
+
+// Relação 1:N - Medicamento -> Ministra
+Medicamento.hasMany(Ministra, { foreignKey: 'medicamento_idmedicamento', as: 'clientesQueUsam' });
+Ministra.belongsTo(Medicamento, { foreignKey: 'medicamento_idmedicamento', as: 'medicamento' });
 
 // --- Relações N:M (Muitos-para-Muitos) ---
 
@@ -68,6 +77,19 @@ Medicamento.belongsToMany(Medicamento, {
     as: 'interacoesSofridas' // Ex: medicamento.getInteracoesSofridas()
 });
 
+// --- Relações da tabela Interacao com Medicamentos (NOVO) ---
+
+// Relação para o primeiro medicamento da interação
+Interacao.belongsTo(Medicamento, { 
+    foreignKey: 'idmedicamento1', 
+    as: 'medicamento1' 
+});
+
+// Relação para o segundo medicamento da interação
+Interacao.belongsTo(Medicamento, { 
+    foreignKey: 'idmedicamento2', 
+    as: 'medicamento2' 
+});
 
 // Exporta todos os modelos associados
 module.exports = {

@@ -1,9 +1,12 @@
 const { Medicamento, Farmaceutico, Usuario } = require('../modelos/associacoes');
 
 const criar = async (req, res) => {
-    const { descricao, classe } = req.body;
+    const { nome, descricao, classe } = req.body;
 
     // Validação de entrada
+    if (!nome || nome.trim() === '') {
+        return res.status(400).json({ erro: 'O campo nome é obrigatório.' });
+    }
     if (!descricao || descricao.trim() === '') {
         return res.status(400).json({ erro: 'O campo descrição é obrigatório.' });
     }
@@ -21,6 +24,7 @@ const criar = async (req, res) => {
         }
 
         const novoMedicamento = await Medicamento.create({
+            nome,
             descricao,
             classe,
             farmaceutico_idfarmaceutico: farmaceutico.idfarmaceutico
@@ -56,8 +60,11 @@ const listar = async (req, res) => {
 // FARMACÊUTICO: Editar um medicamento existente
 const editar = async (req, res) => {
     const { id } = req.params; // ID do medicamento a ser editado
-    const { descricao, classe } = req.body;
+    const { nome, descricao, classe,  } = req.body;
 
+    if (!nome || nome.trim() === '') {
+        return res.status(400).json({ erro: 'O campo nome é obrigatório.' });
+    }
     if (!descricao || descricao.trim() === '') {
         return res.status(400).json({ erro: 'O campo descrição é obrigatório.' });
     }
@@ -83,7 +90,7 @@ const editar = async (req, res) => {
         if (medicamento.farmaceutico_idfarmaceutico !== farmaceutico.idfarmaceutico) {
             return res.status(403).json({ erro: 'Você não tem permissão para editar este medicamento.' });
         }
-
+        medicamento.nome = nome;
         medicamento.descricao = descricao;
         medicamento.classe = classe;
         await medicamento.save();

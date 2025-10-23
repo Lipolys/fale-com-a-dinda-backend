@@ -81,6 +81,10 @@ const editar = async (req, res) => {
             return res.status(404).json({ erro: 'FAQ não encontrada.' });
         }
 
+        if (faq.farmaceutico_idfarmaceutico !== farmaceutico.idfarmaceutico) {
+            return res.status(403).json({ erro: 'Você não tem permissão para editar esta dica.' });
+        }
+
         faq.pergunta = pergunta;
         faq.resposta = resposta;
         await faq.save();
@@ -108,6 +112,11 @@ const deletar = async (req, res) => {
         if (!faq) {
             return res.status(404).json({ erro: 'FAQ não encontrada.' });
         }
+
+        if (faq.farmaceutico_idfarmaceutico !== farmaceutico.idfarmaceutico) {
+            return res.status(403).json({ erro: 'Você não tem permissão para deletar este faq.' });
+        }
+
 
         await faq.destroy();
 

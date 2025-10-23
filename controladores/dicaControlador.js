@@ -1,4 +1,3 @@
-
 const { Dica, Farmaceutico, Usuario} = require('../modelos/associacoes');
 
 const criar = async (req, res) => {

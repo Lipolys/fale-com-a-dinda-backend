@@ -5,6 +5,9 @@ const sequelize = require('./modelos/banco');
 const usuario = require ('./rotas/usuariosRotas');
 const dica = require ('./rotas/dicaRotas');
 const faq = require ('./rotas/faqRotas');
+const medicamento = require ('./rotas/medicamentoRotas');
+const ministra = require ('./rotas/ministraRotas');
+const interacao = require ('./rotas/interacaoRotas');
 const app = express()
 const porta = process.env.PORTA_API;
 
@@ -21,6 +24,9 @@ app.use(meuLogger)
 app.use('/usuario', usuario);
 app.use('/dica', dica);
 app.use('/faq', faq);
+app.use('/medicamento', medicamento);
+app.use('/ministra', ministra);
+app.use('/interacao', interacao);
 
 app.get('/', (req, res) => {
     res.send('<h1>API Fale com a Dinda no ar!</h1>');

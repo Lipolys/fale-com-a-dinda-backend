@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require ('express');
+const cors = require('cors');
 const sequelize = require('./modelos/banco');
 const usuario = require ('./rotas/usuariosRotas');
 const dica = require ('./rotas/dicaRotas');
@@ -19,6 +20,7 @@ const meuLogger = (req, res, next) => {
     next();
 }
 
+app.use(cors());
 app.use(express.json())
 app.use(meuLogger)
 app.use('/usuario', usuario);
@@ -45,7 +47,7 @@ app.use(tratadorDeErros);
 
 
 sequelize.authenticate()
-    .then(() =>{
+    .then(() => {
         console.log('✅ Conexão com o banco de dados estabelecida com sucesso.')
         app.listen(porta, () => {
             console.log(`🚀 Servidor Express a funcionar em http://localhost:${porta}`)

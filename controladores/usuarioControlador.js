@@ -1,8 +1,8 @@
 const Usuario = require ('../modelos/usuario');
 const sequelize = require('../modelos/banco');
 const bcrypt = require("bcrypt");
-const {sign} = require("jsonwebtoken");
 const {Cliente, Farmaceutico} = require("../modelos/associacoes");
+const TokenServico = require('../servicos/tokenServico');
 
 const cadastrar = async (req, res) => {
     const { nome, email, senha, telefone, nascimento, tipo, crf } = req.body;
@@ -114,19 +114,16 @@ const login = async (req, res) => {
             });
         }
 
-        // Gera o token JWT
-        const token = sign(
-            { 
-                id: usuario.idusuario, 
-                tipo: usuario.tipo,
-                email: usuario.email 
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
+        // Obtém informações do dispositivo do header (opcional)
+        const deviceInfo = req.headers['user-agent'] || null;
+
+        // Gera par de tokens (access + refresh)
+        const tokens = await TokenServico.gerarParDeTokens(usuario, deviceInfo);
 
         res.status(200).json({ 
-            token,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
+            expiresIn: tokens.expiresIn,
             usuario: {
                 id: usuario.idusuario,
                 nome: usuario.nome,
@@ -143,7 +140,87 @@ const login = async (req, res) => {
     }
 };
 
+/**
+ * Renova o access token usando um refresh token válido
+ */
+const refreshToken = async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({
+            erro: 'Refresh token é obrigatório.'
+        });
+    }
+
+    try {
+        // Verifica se o refresh token é válido
+        const resultado = await TokenServico.verificarRefreshToken(refreshToken);
+
+        if (!resultado) {
+            return res.status(401).json({
+                erro: 'Refresh token inválido ou expirado.'
+            });
+        }
+
+        const { usuario } = resultado;
+
+        // Gera novo par de tokens
+        const deviceInfo = req.headers['user-agent'] || null;
+        const novosTokens = await TokenServico.gerarParDeTokens(usuario, deviceInfo);
+
+        // Rotaciona o token antigo (opcional mas recomendado)
+        await TokenServico.rotacionarToken(refreshToken, novosTokens.refreshToken);
+
+        res.status(200).json({
+            accessToken: novosTokens.accessToken,
+            refreshToken: novosTokens.refreshToken,
+            expiresIn: novosTokens.expiresIn
+        });
+
+    } catch (error) {
+        console.error('Erro ao renovar token:', error);
+        res.status(500).json({
+            erro: 'Erro ao renovar token.'
+        });
+    }
+};
+
+/**
+ * Logout - revoga o refresh token atual
+ */
+const logout = async (req, res) => {
+    const { refreshToken } = req.body;
+
+    if (!refreshToken) {
+        return res.status(400).json({
+            erro: 'Refresh token é obrigatório.'
+        });
+    }
+
+    try {
+        const sucesso = await TokenServico.revogarToken(refreshToken);
+
+        if (!sucesso) {
+            return res.status(404).json({
+                erro: 'Token não encontrado.'
+            });
+        }
+
+        res.status(200).json({
+            mensagem: 'Logout realizado com sucesso.'
+        });
+
+    } catch (error) {
+        console.error('Erro ao fazer logout:', error);
+        res.status(500).json({
+            erro: 'Erro ao processar logout.'
+        });
+    }
+};
+
 module.exports = {
     cadastrar,
-    login
+    login,
+    refreshToken,
+    logout
 };

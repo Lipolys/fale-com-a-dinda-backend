@@ -7,6 +7,8 @@ const Medicamento = require('./medicamento');
 const Ministra = require('./ministra');
 const Faq = require('./faq');
 const Interacao = require('./interacao');
+const RefreshToken = require('./refreshToken');
+
 
 // Relação 1:1 - Usuario <-> Cliente
 Usuario.hasOne(Cliente, { foreignKey: 'usuario_idusuario', as: 'cliente' });
@@ -91,6 +93,17 @@ Interacao.belongsTo(Medicamento, {
     as: 'medicamento2' 
 });
 
+// Relação 1:N - Usuario -> RefreshToken
+Usuario.hasMany(RefreshToken, {
+    foreignKey: 'usuario_idusuario',
+    as: 'refreshTokens'
+});
+
+RefreshToken.belongsTo(Usuario, {
+    foreignKey: 'usuario_idusuario',
+    as: 'usuario'
+});
+
 // Exporta todos os modelos associados
 module.exports = {
     Usuario,
@@ -101,5 +114,6 @@ module.exports = {
     Ministra,
     Faq,
     Interacao,
+    RefreshToken,
     sequelize: require('./banco') // Exporta a instância do sequelize também
 };

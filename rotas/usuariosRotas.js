@@ -1,8 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const {cadastrar, login} = require("../controladores/usuarioControlador");
+const {
+    cadastrar,
+    login,
+    refreshToken,
+    logout
+} = require("../controladores/usuarioControlador");
 
-router.post('/cadastrar', cadastrar)
-router.post('/login', login)
+// Rotas públicas
+router.post('/cadastrar', cadastrar);
+router.post('/login', login);
+router.post('/refresh-token', refreshToken);
+router.post('/logout', logout);
 
 module.exports = router;

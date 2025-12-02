@@ -71,7 +71,7 @@ const listarPorClienteLogado = async (req, res) => {
             include: [{
                 model: Medicamento,
                 as: 'medicamento', // Sequelize usará o 'as' definido na associação se houver
-                attributes: ['descricao', 'classe'] // Inclui detalhes do medicamento
+                attributes: ['nome', 'descricao', 'classe'] // Inclui detalhes do medicamento
             }]
             // Ordenar por horário, por exemplo: order: [['horario', 'ASC']]
         });
@@ -101,7 +101,7 @@ const listarUm = async (req, res) => {
             include: [{
                 model: Medicamento,
                 as: 'medicamento',
-                attributes: ['descricao', 'classe']
+                attributes: ['nome', 'descricao', 'classe']
             }]
         });
 

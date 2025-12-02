@@ -3,6 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const sequelize = require('./modelos/banco');
+// Importa associações para garantir que as relações sejam carregadas
+require('./modelos/associacoes');
 const usuario = require('./rotas/usuariosRotas');
 const dica = require('./rotas/dicaRotas');
 const faq = require('./rotas/faqRotas');
@@ -55,6 +57,13 @@ sequelize.authenticate()
     .then(() => {
         console.log('✅ Conexão com o banco de dados estabelecida com sucesso.');
 
+        // Sincroniza modelos com o banco (SEM apagar dados existentes)
+        // sync() apenas cria tabelas que não existem, preservando dados
+        return sequelize.sync();
+    })
+    .then(() => {
+        console.log('✅ Modelos sincronizados com o banco de dados.');
+
         // Inicia o job de limpeza de tokens expirados
         LimpezaTokensJob.agendar();
 
@@ -63,5 +72,5 @@ sequelize.authenticate()
         });
     })
     .catch(err => {
-        console.error('❌ Não foi possível conectar ao banco de dados:', err);
+        console.error('❌ Erro ao inicializar servidor:', err);
     });

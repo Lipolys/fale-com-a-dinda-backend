@@ -128,6 +128,7 @@ const login = async (req, res) => {
                 id: usuario.idusuario,
                 nome: usuario.nome,
                 email: usuario.email,
+                telefone: usuario.telefone,
                 tipo: usuario.tipo
             }
         });

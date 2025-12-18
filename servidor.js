@@ -67,7 +67,7 @@ sequelize.authenticate()
         // Inicia o job de limpeza de tokens expirados
         LimpezaTokensJob.agendar();
 
-        app.listen(porta, () => {
+        app.listen(porta, '0.0.0.0', () => {
             console.log(`🚀 Servidor Express a funcionar em http://localhost:${porta}`);
         });
     })

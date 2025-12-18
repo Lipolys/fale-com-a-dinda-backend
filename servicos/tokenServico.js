@@ -108,8 +108,35 @@ class TokenServico {
                 }]
             });
 
-            // Verifica se o token existe e está ativo
-            if (!refreshToken || !refreshToken.isActive()) {
+            // Verifica se o token existe no banco
+            if (!refreshToken) {
+                console.warn('Refresh token não encontrado no banco de dados');
+                return null;
+            }
+
+            // Verifica se o token foi revogado
+            if (refreshToken.is_revoked) {
+                console.warn('Tentativa de uso de token revogado:', {
+                    tokenId: refreshToken.idrefreshtoken,
+                    usuarioId: refreshToken.usuario_idusuario,
+                    revokedAt: refreshToken.revoked_at
+                });
+                return null;
+            }
+
+            // Verifica se o token está expirado
+            if (refreshToken.isExpired()) {
+                console.warn('Tentativa de uso de token expirado:', {
+                    tokenId: refreshToken.idrefreshtoken,
+                    usuarioId: refreshToken.usuario_idusuario,
+                    expiresAt: refreshToken.expires_at
+                });
+                return null;
+            }
+
+            // Verifica se está ativo (combina as verificações acima)
+            if (!refreshToken.isActive()) {
+                console.warn('Token não está ativo');
                 return null;
             }
 
@@ -119,9 +146,15 @@ class TokenServico {
                 usuario: refreshToken.usuario
             };
         } catch (error) {
-            if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
+            if (error.name === 'JsonWebTokenError') {
+                console.warn('Token JWT inválido:', error.message);
                 return null;
             }
+            if (error.name === 'TokenExpiredError') {
+                console.warn('Token JWT expirado:', error.message);
+                return null;
+            }
+            console.error('Erro ao verificar refresh token:', error);
             throw error;
         }
     }
@@ -182,16 +215,19 @@ class TokenServico {
     /**
      * Rotaciona um refresh token (cria novo e revoga o antigo)
      * @param {string} tokenAntigo - Token antigo a ser rotacionado
+     * @param {number} usuarioId - ID do usuário
      * @param {string} novoToken - Novo token gerado
+     * @param {string} deviceInfo - Informações do dispositivo (opcional)
      * @returns {Promise<boolean>} True se rotacionado com sucesso
      */
-    static async rotacionarToken(tokenAntigo, novoToken) {
+    static async rotacionarToken(tokenAntigo, usuarioId, novoToken, deviceInfo = null) {
         try {
             const refreshToken = await RefreshToken.findOne({
                 where: { token: tokenAntigo }
             });
 
             if (!refreshToken) {
+                console.warn('Token antigo não encontrado para rotação:', tokenAntigo.substring(0, 20) + '...');
                 return false;
             }
 
@@ -201,6 +237,10 @@ class TokenServico {
             refreshToken.replaced_by_token = novoToken;
             await refreshToken.save();
 
+            // Salva o novo token no banco de dados
+            await this.salvarRefreshToken(usuarioId, novoToken, deviceInfo);
+
+            console.log(`Token rotacionado com sucesso para usuário ${usuarioId}`);
             return true;
         } catch (error) {
             console.error('Erro ao rotacionar token:', error);

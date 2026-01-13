@@ -249,9 +249,23 @@ const logout = async (req, res) => {
     }
 };
 
+const listarClientes = async (req, res) => {
+    try {
+        const clientes = await Usuario.findAll({
+            where: { tipo: 'CLIENTE' },
+            attributes: ['idusuario', 'nome', 'email', 'telefone', 'nascimento']
+        });
+        res.status(200).json(clientes);
+    } catch (error) {
+        console.error('Erro ao listar clientes:', error);
+        res.status(500).json({ erro: 'Erro ao listar clientes.' });
+    }
+};
+
 module.exports = {
     cadastrar,
     login,
     refreshToken,
-    logout
+    logout,
+    listarClientes
 };

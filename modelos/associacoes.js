@@ -8,6 +8,7 @@ const Ministra = require('./ministra');
 const Faq = require('./faq');
 const Interacao = require('./interacao');
 const RefreshToken = require('./refreshToken');
+const Notificacao = require('./notificacao'); // NOVO
 
 
 // Relação 1:1 - Usuario <-> Cliente
@@ -37,11 +38,20 @@ Faq.belongsTo(Farmaceutico, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'fa
 Farmaceutico.hasMany(Interacao, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'interacoesRegistradas' });
 Interacao.belongsTo(Farmaceutico, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'farmaceutico' });
 
+// Relação 1:N - Farmaceutico -> Notificacao (NOVO)
+Farmaceutico.hasMany(Notificacao, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'notificacoesEnviadas' });
+Notificacao.belongsTo(Farmaceutico, { foreignKey: 'farmaceutico_idfarmaceutico', as: 'farmaceutico' });
+
+
 // --- Relações diretas da tabela Ministra (NOVO) ---
 
 // Relação 1:N - Cliente -> Ministra
 Cliente.hasMany(Ministra, { foreignKey: 'cliente_idcliente', as: 'medicamentosMinistrados' });
 Ministra.belongsTo(Cliente, { foreignKey: 'cliente_idcliente', as: 'cliente' });
+
+// Relação 1:N - Cliente -> Notificacao (NOVO)
+Cliente.hasMany(Notificacao, { foreignKey: 'cliente_idcliente', as: 'notificacoesRecebidas' });
+Notificacao.belongsTo(Cliente, { foreignKey: 'cliente_idcliente', as: 'cliente' });
 
 // Relação 1:N - Medicamento -> Ministra
 Medicamento.hasMany(Ministra, { foreignKey: 'medicamento_idmedicamento', as: 'clientesQueUsam' });
@@ -82,15 +92,15 @@ Medicamento.belongsToMany(Medicamento, {
 // --- Relações da tabela Interacao com Medicamentos (NOVO) ---
 
 // Relação para o primeiro medicamento da interação
-Interacao.belongsTo(Medicamento, { 
-    foreignKey: 'idmedicamento1', 
-    as: 'medicamento1' 
+Interacao.belongsTo(Medicamento, {
+    foreignKey: 'idmedicamento1',
+    as: 'medicamento1'
 });
 
 // Relação para o segundo medicamento da interação
-Interacao.belongsTo(Medicamento, { 
-    foreignKey: 'idmedicamento2', 
-    as: 'medicamento2' 
+Interacao.belongsTo(Medicamento, {
+    foreignKey: 'idmedicamento2',
+    as: 'medicamento2'
 });
 
 // Relação 1:N - Usuario -> RefreshToken
@@ -115,5 +125,6 @@ module.exports = {
     Faq,
     Interacao,
     RefreshToken,
+    Notificacao, // NOVO
     sequelize: require('./banco') // Exporta a instância do sequelize também
 };

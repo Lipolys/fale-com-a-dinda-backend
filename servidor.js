@@ -11,6 +11,7 @@ const faq = require('./rotas/faqRotas');
 const medicamento = require('./rotas/medicamentoRotas');
 const ministra = require('./rotas/ministraRotas');
 const interacao = require('./rotas/interacaoRotas');
+const notificacao = require('./rotas/notificacaoRotas'); // NOVO
 const LimpezaTokensJob = require('./servicos/limparTokensExpirados');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/faq', faq);
 app.use('/medicamento', medicamento);
 app.use('/ministra', ministra);
 app.use('/interacao', interacao);
+app.use('/notificacao', notificacao); // NOVO
 
 app.get('/', (req, res) => {
     res.send('<h1>API Fale com a Dinda no ar!</h1>');
